@@ -54,27 +54,34 @@ A web-based application that streamlines the insurance claim process for employe
 - PostgreSQL
 - Git
 
-### Steps
 
+---
 
-# 1️⃣ PREREQUISITES:
-# Make sure the following are installed:
-# - Go (v1.20 or later): https://go.dev/dl/
-# - PostgreSQL: https://www.postgresql.org/download/
-# - Git: https://git-scm.com/
-# - Live Server (for frontend, optional): https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer
+## ⚙️ Setup Instructions
 
-# 2️⃣ CLONE THE REPOSITORY:
+### 📌 Prerequisites
+
+Ensure the following are installed:
+
+- [Go](https://go.dev/dl/) (v1.20 or later)
+- [PostgreSQL](https://www.postgresql.org/download/)
+- [Git](https://git-scm.com/)
+- [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) (optional for frontend)
+
+### 📥 Installation Steps
+
+```bash
+# 1️⃣ Clone the Repository
 git clone https://github.com/your-username/insurance-management-system.git
 cd insurance-management-system
 
-# 3️⃣ SETUP POSTGRESQL DATABASE:
-# Create a database named `insurance_db` (or your custom name).
-# Example using psql:
-# CREATE DATABASE insurance_db;
+# 2️⃣ Set Up PostgreSQL Database
+# Open psql and create a new database:
+psql -U your_username
+CREATE DATABASE insurance_db;
 
-# 4️⃣ CONFIGURE ENVIRONMENT:
-# If using a `.env` file or hardcoded config, set the following values:
+# 3️⃣ Configure Environment
+# Either use .env file or hardcode the following:
 # DB_HOST=localhost
 # DB_PORT=5432
 # DB_USER=your_username
@@ -82,19 +89,30 @@ cd insurance-management-system
 # DB_NAME=insurance_db
 # JWT_SECRET=your_secret_key
 
-# 5️⃣ INSTALL DEPENDENCIES (Golang modules):
+# 4️⃣ Install Go Dependencies
 go mod tidy
 
-# 6️⃣ AUTO-MIGRATE DATABASE TABLES (inside main.go or setup script):
+# 5️⃣ Auto-Migrate DB Tables (inside main.go or setup script)
+# Example:
 # db.AutoMigrate(&User{}, &Claim{})
 
-# 7️⃣ RUN THE BACKEND SERVER:
+# 6️⃣ Run the Backend Server
 go run main.go
 
-# 8️⃣ START THE FRONTEND:
-# Open frontend/index.html in browser
-# OR use Live Server / Python server:
-# python3 -m http.server 8080 --directory frontend
+# 7️⃣ Launch the Frontend
+# Option 1: Open frontend/index.html directly in browser
+# Option 2: Serve via Python
+python3 -m http.server 8080 --directory frontend
+
+# ==========================================================
+# 📡 API ENDPOINTS
+# ==========================================================
+
+# POST   /login          - Authenticate user/admin
+# POST   /register       - Register a new user
+# GET    /claims         - View all claims (Admin only)
+# POST   /claim          - Submit a new claim
+# PUT    /claim/:id      - Approve/Reject claim (Admin)
 
 # ==========================================================
 # 🧠 LEARNING OUTCOMES
