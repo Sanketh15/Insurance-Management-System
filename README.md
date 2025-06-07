@@ -26,6 +26,8 @@ A web-based application that streamlines the insurance claim process for employe
 
 ---
 
+---
+
 ## ⚙️ Setup Instructions
 
 ### 📌 Prerequisites
@@ -39,7 +41,7 @@ Ensure the following are installed:
 
 ### 📥 Installation Steps
 
-
+```bash
 # 1️⃣ Clone the Repository
 git clone https://github.com/your-username/insurance-management-system.git
 cd insurance-management-system
