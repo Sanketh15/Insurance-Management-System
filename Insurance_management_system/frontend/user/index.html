@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Responsive Sidebar</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="logo">
+      <h2>Staff</h2>
+    </div>
+    <ul class="menu">
+      <li><a href="index.html"><i class="fas fa-home"></i><span class="menu-text">Home</span></a></li>
+      <li><a href="profile.html"  id="profile-link" class="disabled"><i class="fas fa-user"></i><span class="menu-text">Profile</span></a></li>
+      <li><a href="report.html" id="report-link" class="disabled"><i class="fas fa-clipboard-list"></i><span class="menu-text">Report</span></a></li>
+    </ul>
+    <div class="logout-btn">
+      <a href="#" class="logout-link" id="logoutlink"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="navbar">
+      <button class="hamburger-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+      <h2>Fill Details</h2>
+    </div>
+
+    <!-- This section is for displaying the form if it hasn't been filled yet -->
+    <div id="form-container">
+      <form class="form" id="detailsform" enctype="multipart/form-data">
+        <!-- Name Field -->
+        <div class="form__item">
+          <label for="name" class="form__label">Name</label>
+          <input type="text" class="form__input" id="name" name="name" placeholder="Enter your full name" required readonly>
+        </div>
+        
+        <!-- Email Field (Fetched from Login) -->
+        <div class="form__item">
+          <label for="email" class="form__label">Email</label>
+          <input type="email" class="form__input" id="email" name="email" placeholder="Enter your email address" required readonly>
+        </div>
+        
+        <!-- Phone Number Field -->
+        <div class="form__item">
+          <label for="phone" class="form__label">Phone Number</label>
+          <input type="tel" class="form__input" id="phone" name="phone" placeholder="Enter your 10-digit phone number" pattern="[0-9]{10}" required>
+        </div>
+        
+        <!-- PAN Card ID -->
+        <div class="form__item">
+          <label for="pan" class="form__label">PAN Number</label>
+          <input type="text" class="form__input" id="pan" name="pan" placeholder="Enter your PAN number" required>
+        </div>
+        
+        <!-- Salary Field -->
+        <div class="form__item">
+          <label for="salary" class="form__label">Salary</label>
+          <input type="number" class="form__input" id="salary" name="salary" placeholder="Enter your salary" required>
+        </div>
+        
+        <!-- Insurance Plan Dropdown -->
+        <div class="form__item">
+          <label for="insurancePlan" class="form__label">Insurance Plan</label>
+          <select class="form__input" id="insurancePlan" name="insurancePlan" required>
+            <option value="" disabled selected>Select your plan</option>
+            <option value="silver">Silver Plan - ₹200</option>
+            <option value="gold">Gold Plan - ₹500</option>
+            <option value="diamond">Diamond Plan - ₹1000</option>
+          </select>
+        </div>
+        
+        <!-- Passport Photo Upload -->
+        <div class="form__item">
+          <label for="passportPhoto" class="form__label">Upload Passport Photo</label>
+          <input type="file" class="form__input" id="passportPhoto" name="passportPhoto" accept="image/*" required>
+        </div>
+        
+        <!-- ID Proof Upload -->
+        <div class="form__item">
+          <label for="idProof" class="form__label">Upload ID Proof</label>
+          <input type="file" class="form__input" id="idProof" name="idProof" accept="image/*,application/pdf" required>
+        </div>
+        
+        <button type="submit" class="form__btn">Save</button>
+      </form>
+    </div>
+
+    <!-- This section is for displaying the message if the form has been filled already -->
+    <div id="submission-status-message" style="display: none;">
+        <p class="form-input">You have already filled the form.</p>
+    </div>
+
+    <script>
+      // Get the username from session storage (ensure it's correctly set)
+      const username = sessionStorage.getItem("username");
+      
+      // Function to check if the user has filled the form
+      async function checkIfFormFilled(username) {
+        try {
+          const response = await fetch(`http://localhost:8080/applications/${username}`);
+          if (response.ok) {
+            const data = await response.json();
+            // Using the property names as returned from your API (snake_case in this example)
+            if (
+              data &&
+              data.length > 0 &&
+              data[0].name &&
+              data[0].email &&
+              data[0].phone &&
+              data[0].pan &&
+              data[0].salary &&
+              data[0].insurance_plan &&
+              data[0].passport_photo &&
+              data[0].id_proof
+            ) {
+              // If the form is already filled, hide the form and show submission message
+              document.getElementById("form-container").style.display = "none";
+              document.getElementById("submission-status-message").style.display = "block";
+              
+              // Enable the Profile link after form submission:
+              const profileLink = document.getElementById("profile-link");
+              profileLink.classList.remove("disabled");
+              profileLink.setAttribute("href", "profile.html");
+              
+              // Enable the Report link after form submission:
+              const reportLink = document.getElementById("report-link");
+              reportLink.classList.remove("disabled");
+              reportLink.setAttribute("href", "report.html");
+            } else {
+              // If the form is not filled, show the form and disable both links
+              document.getElementById("form-container").style.display = "block";
+              document.getElementById("submission-status-message").style.display = "none";
+              
+              const profileLink = document.getElementById("profile-link");
+              profileLink.classList.add("disabled");
+              profileLink.removeAttribute("href");
+              
+              const reportLink = document.getElementById("report-link");
+              reportLink.classList.add("disabled");
+              reportLink.removeAttribute("href");
+            }
+          } else {
+            alert("Failed to fetch form status.");
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          alert("Error checking form status.");
+        }
+      }
+      
+      // Call the function on page load to check if the form is filled
+      checkIfFormFilled(username);
+      
+      // Form submission handler
+      document.getElementById("detailsform").addEventListener("submit", async (event) => {
+        event.preventDefault();
+      
+        try {
+          const formData = new FormData(event.target);
+          const response = await fetch("http://localhost:8080/applications", {
+            method: "POST",
+            body: formData,
+          });
+      
+          if (response.ok) {
+            alert("Details saved successfully!");
+            // After successful submission, hide the form and show the submission message
+            document.getElementById("form-container").style.display = "none";
+            document.getElementById("submission-status-message").style.display = "block";
+            
+            // Enable the Profile link after submission:
+            const profileLink = document.getElementById("profile-link");
+            profileLink.classList.remove("disabled");
+            profileLink.setAttribute("href", "profile.html");
+            
+            // Enable the Report link after submission:
+            const reportLink = document.getElementById("report-link");
+            reportLink.classList.remove("disabled");
+            reportLink.setAttribute("href", "report.html");
+          } else {
+            alert("Failed to save details!");
+          }
+        } catch (error) {
+          alert("Error: " + error.message);
+        }
+      });
+      
+      // Clear user-specific storage on logout
+      document.getElementById("logoutlink").addEventListener("click", () => {
+        localStorage.removeItem(`formSubmitted_${username}`);
+      });
+      </script>
+      
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/slidebars@2.0.2/dist/slidebars.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- FontAwesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+
+<body class="user-dashboard">
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="logo" id="logo">
+      <h2 id="logo-text">Admin</h2>
+    </div>
+    <ul class="menu">
+      <li><a href="index.html"><i class="fas fa-home"></i><span class="menu-text">Home</span></a></li>
+      <li class="user-nav">
+        <a href="user.html" id="userNav" onclick="toggleSubNav()">
+          <i class="fas fa-user" id="userIcon"></i>
+          <span class="menu-text" id="userText">Users</span>
+        </a>
+        <div class="dropdown-content" id="userSubNav">
+          <!-- Add User Section -->
+          <a href="add_user.html" id="addUserTab">
+            <i class="fas fa-plus-circle icon-toggle" id="addUserIcon"></i>
+            <span class="menu-text">Add User</span>
+          </a>
+          <!-- Delete User Section -->
+          <a href="delete_user.html" id="deleteUserTab">
+            <i class="fas fa-trash-alt icon-toggle" id="deleteUserIcon"></i>
+            <span class="menu-text">Delete User</span>
+          </a>
+          <!-- Modify User Section -->
+          <a href="modify_user.html" id="modifyUserTab">
+            <i class="fas fa-edit icon-toggle" id="modifyUserIcon"></i>
+            <span class="menu-text">Modify User</span>
+          </a>
+        </div>
+      </li>
+      <li><a href="application.html"><i class="fas fa-clipboard-list"></i><span class="menu-text">Application</span></a></li>
+      <li><a href="inbox.html"><i class="fas fa-envelope"></i><span class="menu-text">Inbox</span></a></li>
+    </ul>
+    <div class="logout-btn">
+      <a href="#" class="logout-link"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content" id="mainContent">
+    <!-- Navbar -->
+    <div class="navbar" id="navbar">
+      <div class="navbar-left">
+        <button onclick="toggleSidebar()" class="hamburger-btn"><i class="fas fa-bars"></i></button>
+      </div>
+      <div class="navbar-right">
+        <input type="text" placeholder="Search...">
+        <button><i class="fas fa-search"></i></button>
+      </div>
+    </div>
+
+    <!-- Insurance Claimed Title -->
+    <header class="staff-header">
+      <i class="fas fa-user"></i> Insurance Claimed Details
+    </header>
+
+    <!-- Insurance Claimed Table -->
+    <div class="staff-table1">
+      <table id="claimed">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Message</th>
+          </tr>
+        </thead>
+        <tbody id="insurance-claims">
+          <!-- Dynamic rows will be inserted here -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- External JavaScript -->
+  <script>
+    // Fetching data from the API
+    function fetchInsuranceClaims() {
+      fetch('http://localhost:8080/applications')
+        .then(response => response.json())  // Parse the JSON response
+        .then(data => {
+          const claimsTableBody = document.getElementById('insurance-claims');
+          
+          // Loop through the fetched data and display it in the table
+          data.forEach(claim => {
+            // Check if the claim is approved and the Reason is filled
+            if (claim.approved && claim.Reason) {
+              const row = document.createElement('tr');
+              row.innerHTML = `
+                <td>${claim.name}</td>
+                <td>${claim.Reason}</td>
+              `;
+              claimsTableBody.appendChild(row);
+            }
+          });
+        })
+        .catch(error => console.error('Error fetching data:', error)); // Handle errors
+    }
+
+    // Call the function to fetch and display insurance claims when the page loads
+    window.onload = fetchInsuranceClaims;
+  </script>
+  <script src="script.js"></script>
+</body>
+
+</html>

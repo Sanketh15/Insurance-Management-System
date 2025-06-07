@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+  <div class="sidebar" id="sidebar">
+    <div class="logo" id="logo">
+      <h2 id="logo-text">Admin</h2>
+    </div>
+    <ul class="menu">
+      <li><a href="index.html"><i class="fas fa-home"></i><span class="menu-text">Home</span></a></li>
+      <li class="user-nav">
+        <a href="user.html" id="userNav" onclick="toggleSubNav()">
+          <i class="fas fa-user" id="userIcon"></i>
+          <span class="menu-text" id="userText">Users</span>
+        </a>
+        <div class="dropdown-content" id="userSubNav">
+          <a href="add_user.html" id="addUserTab">
+            <i class="fas fa-plus-circle icon-toggle" id="addUserIcon"></i>
+            <span class="menu-text">Add User</span>
+          </a>
+          <a href="delete_user.html" id="deleteUserTab">
+            <i class="fas fa-trash-alt icon-toggle" id="deleteUserIcon"></i>
+            <span class="menu-text">Delete User</span>
+          </a>
+          <a href="modify_user.html" id="modifyUserTab">
+            <i class="fas fa-edit icon-toggle" id="modifyUserIcon"></i>
+            <span class="menu-text">Modify User</span>
+          </a>
+        </div>
+      </li>
+      <li><a href="application.html"><i class="fas fa-clipboard-list"></i><span class="menu-text">Application</span></a></li>
+      <li><a href="inbox.html"><i class="fas fa-envelope"></i><span class="menu-text">Inbox</span></a></li>
+    </ul>
+    <div class="logout-btn">
+      <a href="#" class="logout-link" id="logoutlink"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="navbar" id="navbar">
+      <div class="navbar-left">
+        <button onclick="toggleSidebar()" class="hamburger-btn"><i class="fas fa-bars"></i></button>
+      </div>
+      <div class="navbar-right">
+        <input type="text" placeholder="Search...">
+        <button><i class="fas fa-search"></i></button>
+      </div>
+    </div>
+
+    <div class="dashboard">
+      <div class="card">
+        <h3>Total Users</h3>
+        <p id="totalUsers">0</p>
+      </div>
+      <div class="card">
+        <h3>Approved Users</h3>
+        <p id="approvedUsers">0</p>
+      </div>
+      <div class="card">
+        <h3>Rejected Users</h3>
+        <p id="rejectedUsers">0</p>
+      </div>
+    </div>
+
+    <script>
+      // Function to fetch and render users data
+      async function fetchAndRenderUsers() {
+        try {
+          const response = await fetch('http://localhost:8080/applications'); // Replace with your actual API URL
+          if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+
+          const applications = await response.json();
+          const totalUsers = applications.length;
+          const approvedUsers = applications.filter(app => app.approved).length;
+          const rejectedUsers = applications.filter(app => app.rejected).length;
+
+          // Update the dashboard stats
+          document.getElementById('totalUsers').innerText = totalUsers;
+          document.getElementById('approvedUsers').innerText = approvedUsers;
+          document.getElementById('rejectedUsers').innerText = rejectedUsers;
+        } catch (error) {
+          console.error('Error fetching data:', error);
+        }
+      }
+
+      // Call the fetch function when the page loads
+      window.onload = fetchAndRenderUsers;
+    </script>
+
+    <script src="script.js"></script>
+  </div>
+</body>
+</html>

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add User</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+    /* General Styles */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    /* Container */
+    .container {
+      width: 100%;
+      max-width: 400px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    /* Header */
+    .staff-header {
+      font-size: 24px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    .staff-header i {
+      margin-right: 8px;
+      color: #007bff;
+    }
+
+    /* Form Styles */
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    label {
+      font-size: 14px;
+      font-weight: bold;
+      text-align: left;
+      color: #333;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: #007bff;
+      box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    }
+
+    /* Buttons */
+    .btn {
+      width: 100%;
+      background-color: #007bff;
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .btn:hover {
+      background-color: #0056b3;
+    }
+
+    .btn-back {
+      margin-top: 10px;
+      width: 100%;
+      background-color: #6c757d;
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .btn-back:hover {
+      background-color: #5a6268;
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      .container {
+        width: 90%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Add User Section -->
+    <div id="addUser" class="section active">
+      <header class="staff-header">
+        <i class="fas fa-user"></i> Add User
+      </header>
+  
+      <form id="addUserForm">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+
+        <label for="role">Role:</label>
+        <select id="role" name="role" required>
+          <option value="Admin">Admin</option>
+          <option value="User">User</option>
+        </select>
+
+        <button type="submit" class="btn">Add User</button>
+      </form>
+
+      <!-- Back Button -->
+      <button onclick="goBack()" class="btn-back">Go Back</button>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById("addUserForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const formData = new FormData(event.target);
+      
+      try {
+        const response = await fetch("http://localhost:8080/userregister", {
+          method: "POST",
+          body: JSON.stringify({
+            username: formData.get("username"),
+            email: formData.get("email"),
+            password: formData.get("password"),
+            role: formData.get("role")
+          }),
+          headers: { "Content-Type": "application/json" },
+        });
+
+        if (response.ok) {
+          alert("User added successfully!");
+        } else {
+          const error = await response.json();
+          alert("Failed to add user: " + error.message);
+        }
+      } catch (err) {
+        alert("Error: " + err.message);
+      }
+    });
+
+    function goBack() {
+      window.history.back();
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Responsive Sidebar</title>
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <!-- Your custom stylesheet -->
+  <link rel="stylesheet" href="style.css">
+  <style>
+   /* Table styling */
+   .table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px auto;
+    }
+    .table th,
+    .table td {
+      padding: 12px;
+      border: 1px solid #ddd;
+      text-align: left;
+    }
+    /* Header for media section */
+    .table th.media-header {
+      text-align: center;
+      background: #f5f5f5;
+      font-size: 1.1em;
+    }
+    /* Styling for the media row */
+    .media-row td {
+      width: 50%;
+      vertical-align: top;
+      text-align: center;
+    }
+    /* Container for the images */
+    .image-container {
+      margin: 10px auto;
+      max-width: 250px; /* Adjust this as needed */
+      border: 1px solid #ccc;
+      padding: 5px;
+    }
+    /* Ensure the images are responsive */
+    .image-container img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+    }
+
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="logo">
+      <h2>Staff</h2>
+    </div>
+    <ul class="menu">
+      <li><a href="index.html"><i class="fas fa-home"></i><span class="menu-text">Home</span></a></li>
+      <li><a href="profile.html"><i class="fas fa-user"></i><span class="menu-text">Profile</span></a></li>
+      <li><a href="report.html"><i class="fas fa-clipboard-list"></i><span class="menu-text">Report</span></a></li>
+    </ul>
+    <div class="logout-btn">
+      <a href="#" class="logout-link" id="logoutlink"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="navbar">
+      <button class="hamburger-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+      <h2>View Details</h2>
+    </div>
+    <div id="profile-section" class="form">
+      <div>
+        <h2 class="form__title">User Profile</h2>
+        <table class="table">
+          <tr>
+            <th>Name</th>
+            <td><span id="profile-name"></span></td>
+          </tr>
+          <tr>
+            <th>Email ID</th>
+            <td><span id="profile-email"></span></td>
+          </tr>
+          <tr>
+            <th>Phone Number</th>
+            <td><span id="profile-phone"></span></td>
+          </tr>
+          <tr>
+            <th>PAN Number</th>
+            <td><span id="profile-pan"></span></td>
+          </tr>
+          <tr>
+            <th>Salary</th>
+            <td><span id="profile-salary"></span></td>
+          </tr>
+          <tr>
+            <th>Insurance Plan</th>
+            <td><span id="profile-insur"></span></td>
+          </tr>
+        
+          <!-- Combined row for Photo and ID Proof -->
+          <tr class="media-row">
+            <td>
+              <strong>Photo</strong>
+              <div id="profile-photo" class="image-container"></div>
+            </td>
+            <td>
+              <strong>ID Proof</strong>
+              <div id="profile-id" class="image-container"></div>
+            </td>
+          </tr>
+        </table>
+  
+      </div>
+    </div>
+  </div>
+
+  <!-- jQuery and Slidebars libraries -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slidebars@2.0.2/dist/slidebars.min.js"></script>
+  <!-- Your custom JavaScript -->
+  <script src="script.js"></script>
+
+  <script>
+    // Sidebar toggle function
+    function toggleSidebar() {
+      const sidebar = document.querySelector('.sidebar');
+      sidebar.classList.toggle('shrink');
+      const isShrunk = sidebar.classList.contains('shrink');
+      localStorage.setItem("sidebarShrunk", isShrunk.toString());
+    }
+
+    async function fetchProfileFromDatabase() {
+      try {
+        const loggedInUsername = sessionStorage.getItem("username");
+        const loggedInUserEmail = sessionStorage.getItem("email");
+
+        if (!loggedInUsername || !loggedInUserEmail) {
+          console.error("No logged-in user found in sessionStorage.");
+          return;
+        }
+
+        console.log(`Fetching profile for: ${loggedInUsername} (${loggedInUserEmail})`);
+
+        const response = await fetch(`http://localhost:8080/applications/${loggedInUsername}`);
+
+        if (response.ok) {
+          let profileData = await response.json();
+          if (!profileData) {
+            console.error("No profile data found for the logged-in user.");
+            return;
+          }
+
+          if (Array.isArray(profileData)) {
+            profileData = profileData[0];
+          }
+
+          console.log("Fetched Profile Data:", profileData);
+
+          document.getElementById("profile-name").innerText = profileData.name || "N/A";
+          document.getElementById("profile-email").innerText = profileData.email || "N/A";
+          document.getElementById("profile-phone").innerText = profileData.phone || "N/A";
+          document.getElementById("profile-pan").innerText = profileData.pan || "N/A";
+          document.getElementById("profile-salary").innerText = profileData.salary || "N/A";
+          document.getElementById("profile-insur").innerText = profileData.insurance_plan || "N/A";
+
+          // Display Profile Photo (if available)
+          if (profileData.passport_photo) {
+            document.getElementById("profile-photo").innerHTML = 
+              `<img src="http://localhost:8080/${profileData.passport_photo}" class="image-preview" alt="User Photo">`;
+          } else {
+            document.getElementById("profile-photo").innerText = "No photo available";
+          }
+
+          // Handle ID Proof (Image or File)
+          if (profileData.id_proof) {
+            const idProofElement = document.getElementById("profile-id");
+            const fileExtension = profileData.id_proof.split('.').pop().toLowerCase();
+
+            if (["jpg", "jpeg", "png", "gif"].includes(fileExtension)) {
+              // Display image for supported image formats
+              idProofElement.innerHTML = `<img src="http://localhost:8080/${profileData.id_proof}" class="image-preview" alt="ID Proof">`;
+            } else {
+              // Display download link for non-image files
+              idProofElement.innerHTML = `<a href="http://localhost:8080/${profileData.id_proof}" target="_blank" download>
+      <img src="document-logo.png" alt="Download ID Proof" style="width: 100px; height: 150px; object-fit: contain;">
+    </a>`;            }
+          } else {
+            document.getElementById("profile-id").innerText = "No ID proof available";
+          }
+        } else {
+          console.error("Error fetching data:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Error fetching profile data:", error);
+      }
+    }
+
+    // Execute once the DOM content is fully loaded.
+    document.addEventListener("DOMContentLoaded", () => {
+      // Set sidebar state from localStorage
+      const sidebar = document.querySelector('.sidebar');
+      const isShrunk = localStorage.getItem("sidebarShrunk") === "true";
+      if (isShrunk) {
+        sidebar.classList.add('shrink');
+      } else {
+        sidebar.classList.remove('shrink');
+      }
+
+      // Call the async function to fetch and display the profile
+      fetchProfileFromDatabase();
+    });
+  </script>
+  <script src="script.js"></script>
+</body>
+</html>

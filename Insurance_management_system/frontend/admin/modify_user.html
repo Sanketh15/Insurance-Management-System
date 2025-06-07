@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modify User</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body class="modify-user-page">
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="logo" id="logo">
+      <h2 id="logo-text">Admin</h2>
+    </div>
+    <ul class="menu">
+      <li><a href="index.html"><i class="fas fa-home"></i><span class="menu-text">Home</span></a></li>
+      <li class="user-nav">
+        <a href="user.html" id="userNav" onclick="toggleSubNav()">
+          <i class="fas fa-user" id="userIcon"></i>
+          <span class="menu-text" id="userText">Users</span>
+        </a>
+        <div class="dropdown-content" id="userSubNav">
+          <a href="add_user.html"><i class="fas fa-plus-circle icon-toggle"></i><span class="menu-text">Add User</span></a>
+          <a href="delete_user.html"><i class="fas fa-trash-alt icon-toggle"></i><span class="menu-text">Delete User</span></a>
+          <a href="modify_user.html"><i class="fas fa-edit icon-toggle"></i><span class="menu-text">Modify User</span></a>
+        </div>
+      </li>
+      <li><a href="application.html"><i class="fas fa-clipboard-list"></i><span class="menu-text">Application</span></a></li>
+      <li><a href="inbox.html"><i class="fas fa-envelope"></i><span class="menu-text">Inbox</span></a></li>
+    </ul>
+    <div class="logout-btn">
+      <a href="#" class="logout-link"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </div>
+  </div>
+  <div class="main-content">
+    <div class="navbar" id="navbar">
+      <div class="navbar-left">
+        <button onclick="toggleSidebar()" class="hamburger-btn"><i class="fas fa-bars"></i></button>
+      </div>
+      <div class="navbar-right">
+        <input type="text" placeholder="Search...">
+        <button><i class="fas fa-search"></i></button>
+      </div>
+    </div>
+
+    <header class="staff-header">
+      <i class="fas fa-user"></i> Modify User
+    </header>
+
+    <div class="container">
+      <form id="modifyUserForm">
+        <label for="userId">User ID:</label>
+        <input type="text" id="userId" name="userId" required placeholder="Enter User ID" oninput="fetchUserData()">
+        
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" readonly>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email">
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password">
+
+        <label for="role">Role:</label>
+        <select id="role" name="role">
+          <option value="">Select Role</option>
+          <option value="Admin">Admin</option>
+          <option value="User">User</option>
+        </select>
+
+        <button type="submit" class="btn">Modify User</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    async function fetchUserData() {
+      const userId = document.getElementById("userId").value.trim();
+
+      if (userId && !isNaN(userId)) {
+        try {
+          const response = await fetch(`http://localhost:8080/user/${userId}`);
+          if (response.ok) {
+            const user = await response.json();
+            // Populate form with the user data
+            document.getElementById("username").value = user.username;
+            document.getElementById("email").value = user.email;
+            document.getElementById("role").value = user.role;
+          } else {
+            alert("User not found.");
+            clearFormFields();
+          }
+        } catch (error) {
+          alert("Error fetching user data: " + error.message);
+        }
+      } else {
+        clearFormFields();
+      }
+    }
+
+    function clearFormFields() {
+      document.getElementById("username").value = "";
+      document.getElementById("email").value = "";
+      document.getElementById("role").value = "";
+    }
+
+    document.getElementById("modifyUserForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const formData = new FormData(event.target);
+      const userId = formData.get("userId");
+      const payload = {};
+
+      // Add only the modified fields to the payload
+      if (formData.get("username")) payload.username = formData.get("username");
+      if (formData.get("email")) payload.email = formData.get("email");
+      if (formData.get("password")) payload.password = formData.get("password");
+      if (formData.get("role")) payload.role = formData.get("role");
+
+      try {
+        const response = await fetch(`http://localhost:8080/user/${userId}`, {
+          method: "PUT",
+          body: JSON.stringify(payload),
+          headers: { "Content-Type": "application/json" },
+        });
+
+        if (response.ok) {
+          alert("User modified successfully!");
+        } else {
+          const error = await response.json();
+          alert("Failed to modify user: " + error.message);
+        }
+      } catch (err) {
+        alert("Error: " + err.message);
+      }
+    });
+  </script>
+
+  <script src="script.js"></script>
+</body>
+</html>

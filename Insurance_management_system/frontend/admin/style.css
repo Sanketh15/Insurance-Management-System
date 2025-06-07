@@ -1,0 +1,600 @@
+/* General Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Arial', sans-serif;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 250px;
+  height: 100vh;
+  background: #2C3E50;
+  color: white;
+  position: fixed;
+  top: 0;
+  left: 0;
+  padding-top: 20px;
+  transition: width 0.3s ease;
+  z-index: 100;
+}
+
+.sidebar.collapsed {
+  width: 50px;
+}
+
+.sidebar .logo {
+  text-align: center;
+  margin-bottom: 30px;
+  transition: transform 0.3s ease;
+}
+
+.sidebar.collapsed .logo h2 {
+  display: none;
+}
+
+.sidebar .logo h2 {
+  font-size: 28px;
+  font-weight: bold;
+  color: #fff;
+  transition: transform 0.3s ease;
+}
+
+.sidebar.collapsed .logo {
+  transform: rotate(360deg);
+}
+
+.sidebar .menu {
+  list-style-type: none;
+  padding: 0;
+  margin-top: 60px;
+}
+
+.sidebar .menu li {
+  margin: 20px 0;
+  margin-top: 20px;
+}
+
+.sidebar .menu li a {
+  color: white;
+  text-decoration: none;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-radius: 5px;
+  transition: all 0.3s ease;
+}
+
+.sidebar .menu li a i {
+  font-size: 20px;
+  margin-right: 10px;
+}
+
+.sidebar .menu li a:hover {
+  background: #1ABC9C;
+  color: #34495E;
+}
+
+/* Sidebar Toggler */
+.sidebar-toggler {
+  position: absolute;
+  top: 10px;
+  right: -25px;
+  background: #1ABC9C;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  transition: background 0.3s ease;
+}
+
+.sidebar-toggler:hover {
+   background: #1ABC9C;
+}
+
+/* Sidebar Tooltips */
+.sidebar.collapsed .menu li a {
+  position: relative;
+}
+
+/* Show menu text on hover for collapsed sidebar */
+.sidebar.collapsed .menu li a:hover .menu-text {
+  display: inline-block;
+}
+
+/* Always show menu text for outer menu items like Home, Users, Application, Inbox */
+.sidebar.collapsed .menu li a .menu-text {
+  display: none; /* Hide text by default */
+}
+
+/* Show text when hovering over outer menu items in collapsed mode */
+.sidebar.collapsed .menu li a:hover .menu-text {
+  display: inline-block; /* Show text when hovered */
+}
+
+/* Show text for dropdown items (Add User, Delete User, Modify User) in collapsed mode */
+.sidebar.collapsed .user-nav.active .dropdown-content a .menu-text {
+  display: inline-block; /* Show text for dropdown items */
+}
+
+/* Position of sub-menu in collapsed mode */
+.sidebar.collapsed .dropdown-content a .menu-text {
+  display: none; /* Hide text by default */
+}
+
+/* Show text for sub-menu items in dropdown when active */
+.sidebar.collapsed .user-nav.active .dropdown-content a .menu-text {
+  display: inline-block;
+}
+
+/* Menu items hover effects */
+.sidebar.collapsed li a:hover .menu-text {
+  display: inline-block; /* Only show on hover for sub-menu items */
+}
+
+.dropdown-content a {
+  color: rgb(197, 56, 56);
+  padding: 8px 16px;
+  text-decoration: none;
+  display: block;
+  transition: background-color 0.2s ease;
+}
+
+.dropdown-content a:hover {
+  background-color: rgba(197, 56, 56, 0.2); /* Soft hover effect */
+}
+
+/* Active dropdown state when clicked */
+.user-nav.active .dropdown-content {
+  display: block;
+}
+
+/* Main Content */
+.main-content {
+  margin-left: 250px;
+  padding: 20px;
+  transition: margin-left 0.3s ease;
+}
+
+.main-content.stretched {
+  margin-left: 50px;
+}
+
+/* Navbar */
+.navbar {
+  background: #34495E;
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 20px;
+  color: white;
+  align-items: center;
+  position: sticky;
+  top: 0;
+}
+
+.navbar-left {
+  font-size: 20px;
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+}
+
+.navbar input {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  margin-right: 20px;
+  background: #ecf0f1;
+  transition: all 0.3s ease;
+}
+
+.navbar button {
+  background: #1ABC9C;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.navbar button:hover {
+  background: #16A085;
+}
+
+/* Media Queries for Navbar Responsiveness */
+@media (max-width: 768px) {
+  .navbar input {
+    width: 100%;
+    margin-right: 10px;
+  }
+
+  .navbar button {
+    width: 100%;
+  }
+}
+
+/* Dashboard Cards */
+.dashboard {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.card {
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.card h3 {
+  margin-bottom: 10px;
+  color: #2C3E50;
+}
+
+.card p {
+  font-size: 30px;
+  color: #1ABC9C;
+}
+
+.card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Sidebar Logout Button */
+.logout-btn {
+  position: absolute;
+  bottom: 20px;
+  width: 100%;
+  text-align: center;
+}
+
+.logout-btn .logout-link {
+  color: white;
+  text-decoration: none;
+  font-size: 15px;
+  padding: 10px;
+  border-radius: 5px;
+  transition: all 0.3s ease;
+}
+
+.logout-btn .logout-link:hover {
+  background: #1ABC9C;
+  color: #34495E;
+}
+
+/* Table Styling */
+.staff-table table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.staff-table th,
+.staff-table td {
+  text-align: left;
+  padding: 8px;
+  word-wrap: break-word;
+  overflow: hidden;
+  max-width: 150px;
+}
+
+.staff-table th {
+  background-color: #f4f4f4;
+  font-weight: bold;
+}
+
+.staff-table td {
+  background-color: #fff;
+  border-bottom: 1px solid #ddd;
+}
+
+.staff-table tr:hover {
+  background-color: #f1f1f1;
+}
+
+.staff-table .approve-btn,
+.staff-table .reject-btn,
+.staff-table .view-btn {
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  color: white;
+}
+
+.staff-table .approve-btn {
+  background-color: #27ae60;
+}
+
+.staff-table .reject-btn {
+  background-color: #e74c3c;
+}
+
+.staff-table .view-btn {
+  background-color: #3498db;
+}
+
+.staff-table .approve-btn:hover,
+.staff-table .reject-btn:hover,
+.staff-table .view-btn:hover {
+  opacity: 0.8;
+}
+.staff-header {
+  font-size: 24px;
+  margin-top:10px;
+  margin-bottom:30px;
+  font-weight: bold;
+  text-align: center;
+  margin-top: 20px;
+  color: #2c3e50;
+}
+/* Modal (ID Proof View) Styling */
+.dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 200;
+}
+
+.dialog {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  max-width: 90%;
+  max-height: 80vh;
+  overflow: hidden;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.dialog img {
+  width: 100%;
+  height: auto;
+  max-height: 80vh;
+  object-fit: contain;
+  border-radius: 10px;
+}
+
+/* Close Button */
+.dialog .close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #e74c3c;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.dialog .close-btn:hover {
+  background: #c0392b;
+}
+
+/* Base Button Styling */
+.btn {
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  color: white;
+  background: linear-gradient(145deg, #4e9f3d, #3b7a2e);
+}
+
+.btn.approve {
+  background: linear-gradient(145deg, #4e9f3d, #3b7a2e);
+}
+
+.btn.approve i {
+  margin-right: 10px;
+}
+
+.btn.reject {
+  background: linear-gradient(145deg, #e74c3c, #c0392b);
+}
+
+.btn.reject i {
+  margin-right: 10px;
+}
+
+.btn.view {
+  background: linear-gradient(145deg, #3498db, #2980b9);
+}
+
+.btn.view i {
+  margin-right: 10px;
+}
+
+.btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Form Styling */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 20px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+label {
+  font-size: 18px;          /* Slightly larger font size for better readability */
+  font-weight: bold;        /* Bold font for labels */
+  color: #333;              /* Dark color for text for better contrast */
+  margin-bottom: 10px;      /* Add space below the label for clarity */
+  display: block;           /* Make labels block elements to stack vertically */
+  letter-spacing: 0.5px;    /* Slight letter spacing for a cleaner look */
+  text-transform: capitalize; /* Capitalize label text for a clean appearance */
+}
+
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="tel"],
+input[type="password"],
+input[type="date"],
+select {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="number"]:focus,
+input[type="tel"]:focus,
+input[type="password"]:focus,
+input[type="date"]:focus,
+select:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+/* Smaller Button Styles */
+button.btn {
+  background-color: #007bff;      /* Blue background color for the button */
+  color: white;                   /* White text color */
+  font-size: 14px;                 /* Smaller font size */
+  padding: 8px 16px;               /* Reduced padding for a smaller button */
+  border: none;                    /* Remove default button border */
+  border-radius: 16px;              /* Slightly smaller border radius for a more compact button */
+  cursor: pointer;                 /* Pointer cursor on hover */
+  transition: background-color 0.3s ease, transform 0.3s ease; /* Smooth transitions */
+  display: inline-block;           /* Ensure the button doesn't stretch across the entire width */
+  text-align: center;              /* Center the text inside the button */
+  line-height: 1.5;         
+  width: auto;                     /* Allow width to adjust automatically based on content */
+  max-width: 160px;                /* Limit the maximum width */
+  min-width: 120px;   
+  margin-top: 10px;    /* Set a line height to improve vertical alignment */
+}
+
+/* Hover Effect for Button */
+button.btn:hover {
+  background-color: #0056b3;       /* Darker blue background on hover */
+  transform: translateY(-2px);     /* Slight lift effect on hover */
+}
+
+/* Active State for Button */
+button.btn:active {
+  transform: translateY(1px);      /* Slight "press down" effect on button click */
+}
+
+/* Section Visibility */
+.section {
+  display: none;
+}
+
+.section.active {
+  display: block;
+}
+
+
+/* Dropdown in Sidebar */
+.user-nav .dropdown-content {
+  display: none; /* Initially hidden */
+  background-color: #2C3E50;
+  min-width: 160px;
+  z-index: 200;
+  position: absolute;
+  top: 50px;
+  left: 40px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  padding: 5px 0;
+}
+
+/* On Hover: show dropdown */
+.user-nav:hover .dropdown-content {
+  display: block;
+}
+
+/* Style for links inside dropdown */
+.dropdown-content a {
+  color: rgb(197, 56, 56);
+  padding: 8px 16px;
+  text-decoration: none;
+  display: block;
+  transition: background-color 0.2s ease;
+}
+
+.dropdown-content a:hover {
+  background-color: rgba(197, 56, 56, 0.2); /* Soft hover effect */
+}
+
+/* Active dropdown state when clicked */
+.user-nav.active .dropdown-content {
+  display: block;
+}
+
+.staff-table1 {
+  width: 100%;
+  overflow-x: auto; /* Allows horizontal scrolling on smaller screens */
+}
+
+#claimed {
+  width: 100%;
+  border-collapse: collapse; /* Removes spaces between cells */
+}
+
+#claimed th, #claimed td {
+  padding: 12px 15px;
+  text-align: left;
+  border: 1px solid #ccc;
+}
+
+#claimed th {
+  background-color: #f4f4f4;
+  font-weight: bold;
+}
+
+#claimed td {
+  background-color: #fff;
+}
+
+#claimed td:first-child, #claimed th:first-child {
+  width: 30%; /* Set width for Name column */
+}
+
+#claimed td:last-child, #claimed th:last-child {
+  width: 70%; /* Set width for Message column */
+}
+
+/* For responsiveness, you can make the table scrollable horizontally on smaller screens */
+@media (max-width: 768px) {
+  .staff-table1 {
+    display: block;
+    overflow-x: auto;
+  }
+}

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+  <style>
+    /* Styles for image preview */
+    .image-preview {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body class="user-dashboard">
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="logo" id="logo">
+      <h2 id="logo-text">Admin</h2>
+    </div>
+    <ul class="menu">
+      <li><a href="index.html"><i class="fas fa-home"></i><span class="menu-text">Home</span></a></li>
+      <li class="user-nav">
+        <a href="user.html" id="userNav" onclick="toggleSubNav()">
+          <i class="fas fa-user" id="userIcon"></i>
+          <span class="menu-text" id="userText">Users</span>
+        </a>
+        <div class="dropdown-content" id="userSubNav">
+          <a href="add_user.html"><i class="fas fa-plus-circle icon-toggle"></i><span class="menu-text">Add User</span></a>
+          <a href="delete_user.html"><i class="fas fa-trash-alt icon-toggle"></i><span class="menu-text">Delete User</span></a>
+          <a href="modify_user.html"><i class="fas fa-edit icon-toggle"></i><span class="menu-text">Modify User</span></a>
+        </div>
+      </li>
+      <li><a href="application.html"><i class="fas fa-clipboard-list"></i><span class="menu-text">Application</span></a></li>
+      <li><a href="inbox.html"><i class="fas fa-envelope"></i><span class="menu-text">Inbox</span></a></li>
+    </ul>
+    <div id="logoutButton" class="logout-btn">
+      <a href="#" class="logout-link"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content" id="mainContent">
+    <div class="navbar" id="navbar">
+      <div class="navbar-left">
+        <button onclick="toggleSidebar()" class="hamburger-btn"><i class="fas fa-bars"></i></button>
+      </div>
+      <div class="navbar-right">
+        <input type="text" placeholder="Search..." />
+        <button><i class="fas fa-search"></i></button>
+      </div>
+    </div>
+
+    <div class="staff-table">
+      <table>
+        <header class="staff-header">
+          <i class="fas fa-user"></i> User Application
+        </header>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email ID</th>
+            <th>Phone Number</th>
+            <th>PAN Number</th>
+            <th>Salary</th>
+            <th>Insurance Plan</th>
+            <th>Photo</th>
+            <th>ID Proof</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="userTableBody">
+          <!-- User data will be rendered here -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    // Function to check if a file is an image (based on its extension)
+    function isImage(filePath) {
+      return /\.(jpg|jpeg|png|gif)$/i.test(filePath);
+    }
+
+    // Check approval status from localStorage for a given application id
+    function checkApprovalStatus(id) {
+      return localStorage.getItem(`approved-${id}`) === "true";
+    }
+
+    // Approve staff and store the approval flag in localStorage
+    async function approveStaff(id) {
+      if (!confirm('Once approved, you cannot change the status. Do you want to proceed?')) return;
+
+      try {
+        const response = await fetch(`http://localhost:8080/applications/approve/${id}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ approved: true })
+        });
+
+        if (response.ok) {
+          // Save approval flag as a string in localStorage
+          localStorage.setItem(`approved-${id}`, "true");
+
+          // Immediately update the UI for the approved application row
+          document.getElementById(`status-${id}`).innerHTML =
+            `<span class="status approved"><i class="fas fa-check-circle"></i> Approved</span>`;
+        } else {
+          const errorData = await response.json();
+          alert(`Failed to approve application: ${errorData.message || 'Unknown error'}`);
+        }
+      } catch (error) {
+        console.error('Error approving application:', error);
+        alert('An error occurred while approving the application. Please try again later.');
+      }
+    }
+
+    // Reject staff
+    async function rejectStaff(id) {
+      const reason = prompt('Enter the reason for rejection:');
+      if (!reason) {
+        alert('Rejection reason is required.');
+        return;
+      }
+
+      try {
+        const response = await fetch(`http://localhost:8080/applications/reject/${id}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ rejection_reason: reason })
+        });
+
+        if (response.ok) {
+          alert('Application rejected successfully!');
+          // Reload the table after rejection (you could also remove the row)
+          fetchAndRenderUsers();
+        } else {
+          const errorData = await response.json();
+          alert(`Failed to reject application: ${errorData.message || 'Unknown error'}`);
+        }
+      } catch (error) {
+        console.error('Error rejecting application:', error);
+        alert('An error occurred while rejecting the application. Please try again later.');
+      }
+    }
+
+    // Fetch and render user applications
+    async function fetchAndRenderUsers() {
+      try {
+        const response = await fetch('http://localhost:8080/applications');
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+
+        const applications = await response.json();
+        const tableBody = document.getElementById('userTableBody');
+        tableBody.innerHTML = ''; // Clear existing rows
+
+        applications
+          .filter(app => !app.rejected)
+          .forEach(app => {
+            // Determine the approved status based on server data or localStorage
+            const isApproved = app.approved || checkApprovalStatus(app.ID);
+            const statusHtml = isApproved
+              ? `<span class="status approved"><i class="fas fa-check-circle"></i> Approved</span>`
+              : `<div class="action-btns">
+                   <button class="btn approve" id="approve-${app.ID}" onclick="approveStaff(${app.ID})">
+                     <i class="fas fa-check"></i> Approve
+                   </button>
+                   <button class="btn reject" id="reject-${app.ID}" onclick="rejectStaff(${app.ID})">
+                     <i class="fas fa-times"></i> Reject
+                   </button>
+                 </div>`;
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${app.name}</td>
+              <td>${app.email}</td>
+              <td>${app.phone}</td>
+              <td>${app.pan}</td>
+              <td>${app.salary}</td>
+              <td>${app.insurance_plan}</td>
+              <td>
+                <a href="http://localhost:8080/${app.passport_photo}" download>
+                  <img src="http://localhost:8080/${app.passport_photo}" class="image-preview" alt="Passport Photo">
+                </a>
+              </td>
+              <td>
+                ${isImage(app.id_proof)
+                  ? `<a href="http://localhost:8080/${app.id_proof}" download>
+                       <img src="http://localhost:8080/${app.id_proof}" class="image-preview" alt="ID Proof">
+                     </a>`
+                  : `<a href="http://localhost:8080/${app.id_proof}" download class="download-btn">
+                             <img src="document-logo.png" alt="Download ID Proof" style="width: 60px; height: 60px; object-fit: contain;">
+                     </a>`
+                }
+              </td>
+              <td id="status-${app.ID}">
+                ${statusHtml}
+              </td>
+            `;
+            tableBody.appendChild(row);
+          });
+      } catch (error) {
+        console.error('Error fetching user applications:', error);
+      }
+    }
+
+    // Call fetchAndRenderUsers on DOMContentLoaded
+    document.addEventListener('DOMContentLoaded', fetchAndRenderUsers);
+  </script>
+  <script src="script.js"></script>
+</body>
+</html>

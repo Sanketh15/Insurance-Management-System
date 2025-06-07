@@ -1,0 +1,197 @@
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Claim Insurance</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      .info-message { font-weight: bold; margin-top: 15px; color: green; }
+      .updated-salary { margin-top: 15px; font-weight: bold; color: #D9534F; }
+    </style>
+  </head>
+  <body>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+      <div class="logo"><h2>Staff</h2></div>
+      <ul class="menu">
+        <li><a href="index.html"><i class="fas fa-home"></i><span class="menu-text">Home</span></a></li>
+        <li><a href="profile.html"><i class="fas fa-user"></i><span class="menu-text">Profile</span></a></li>
+        <li><a href="report.html" id="report-link"><i class="fas fa-clipboard-list"></i><span class="menu-text">Report</span></a></li>
+      </ul>
+      <div class="logout-btn"><a href="#" class="logout-link"><i class="fas fa-sign-out-alt"></i> Logout</a></div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <div class="navbar">
+        <button class="hamburger-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+        <h2>Claim Insurance</h2>
+      </div>
+
+      <div class="form" id="claim-form">
+        <h2 class="form__title">Reason for Insurance Claim</h2>
+        <div class="form__item" id="claim-reason-container">
+          <label for="claim-reason" class="form__label">Claim Reason</label>
+          <textarea id="claim-reason" class="form__input" rows="4" placeholder="Enter your reason..."></textarea>
+        </div>
+        <div class="deduction-info" id="deduction-info" style="display: none;">
+          Insurance Deduction: <span id="deduction-amount"></span>
+        </div>
+        <button id="claim-btn" class="form__btn">Claim</button>
+        <div class="claim-message" id="claim-message"></div>
+      </div>
+    </div>
+
+    <!-- External Scripts -->
+    <script>
+      function toggleSidebar() {
+        const sidebar = document.querySelector('.sidebar');
+        sidebar.classList.toggle('shrink');
+        localStorage.setItem("sidebarShrunk", sidebar.classList.contains('shrink').toString());
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const sidebar = document.querySelector('.sidebar');
+        if (localStorage.getItem("sidebarShrunk") === "true") sidebar.classList.add('shrink');
+        fetchProfile();
+        document.getElementById('report-link').addEventListener('click', checkClaimBeforeAccessingReport);
+      });
+
+      let currentProfile = null;
+
+      async function fetchProfile() {
+        const loggedInUsername = sessionStorage.getItem("username");
+        if (!loggedInUsername) {
+          console.error("No logged-in user found.");
+          return;
+        }
+
+        console.log(`Fetching profile for: ${loggedInUsername}`);
+
+        try {
+          const response = await fetch(`http://localhost:8080/applications/${loggedInUsername}`);
+          if (response.ok) {
+            const data = await response.json();
+            if (data.length > 0) {
+              currentProfile = data[0];
+              console.log("Fetched profile:", currentProfile);
+              checkInsuranceClaimStatus();
+            } else {
+              console.error("No application found for user.");
+            }
+          } else {
+            console.error("Error fetching profile:", response.statusText);
+          }
+        } catch (error) {
+          console.error("Error fetching profile:", error);
+        }
+      }
+
+      function checkInsuranceClaimStatus() {
+        const claimMessage = document.getElementById("claim-message");
+        const claimReasonContainer = document.getElementById("claim-reason-container");
+        const claimBtn = document.getElementById("claim-btn");
+
+        if (!currentProfile) return;
+
+        if (currentProfile.rejected) {
+          claimReasonContainer.style.display = "none";
+          claimBtn.style.display = "none";
+          claimMessage.innerText = `Your application was rejected.\n\n Reason: ${currentProfile.Reason || "Not specified"}`;
+          return;
+        }
+
+        if (!currentProfile.approved) {
+          claimReasonContainer.style.display = "none";
+          claimBtn.style.display = "none";
+          claimMessage.innerText = "Admin has not approved the application.";
+          return;
+        }
+
+        if (currentProfile.Reason && currentProfile.Reason.trim() !== "") {
+          claimReasonContainer.style.display = "none";
+          claimBtn.style.display = "none";
+          claimMessage.innerText = "Insurance has already been claimed.";
+          displayClaimResult();
+          return;
+        }
+
+        claimReasonContainer.style.display = "block";
+        claimBtn.style.display = "block";
+        claimMessage.innerText = "";
+      }
+
+      function checkClaimBeforeAccessingReport(event) {
+        if (!currentProfile || !currentProfile.Reason || currentProfile.Reason.trim() === "") {
+          event.preventDefault(); // Prevent navigation to the report section
+          alert("Please fill out the claim form first before accessing the report section.");
+        }
+      }
+
+      function getDeductionAmount(plan) {
+        if (!plan) return 0;
+        switch (plan.toLowerCase()) {
+          case "silver": return 200;
+          case "gold": return 500;
+          case "diamond": return 1000;
+          default: return 0;
+        }
+      }
+
+      function displayClaimResult() {
+        const deduction = getDeductionAmount(currentProfile.insurance_plan);
+        document.getElementById("deduction-amount").innerText = "₹" + deduction;
+        document.getElementById("deduction-info").style.display = "block";
+
+        const updatedSalaryDiv = document.createElement("div");
+        updatedSalaryDiv.className = "updated-salary";
+        updatedSalaryDiv.innerText = "Updated Salary after Deduction: ₹" + currentProfile.salary;
+        document.getElementById("claim-form").appendChild(updatedSalaryDiv);
+
+        // **✅ Hide claim button and textbox permanently**
+        document.getElementById("claim-reason-container").style.display = "none";
+        document.getElementById("claim-btn").style.display = "none";
+      }
+
+      document.getElementById("claim-btn").addEventListener("click", async () => {
+        console.log("Claim button clicked.");
+        const reasonInput = document.getElementById("claim-reason").value.trim();
+        if (!reasonInput) {
+          alert("Please enter a reason for the insurance claim.");
+          return;
+        }
+
+        const deduction = getDeductionAmount(currentProfile.insurance_plan);
+        const newSalary = currentProfile.salary - deduction;
+        console.log("Deduction:", deduction, "New Salary:", newSalary);
+
+        const updatedProfile = { ...currentProfile, Reason: reasonInput, salary: newSalary };
+        console.log("Updated profile to send:", updatedProfile);
+
+        try {
+          const updateResponse = await fetch(`http://localhost:8080/applications/${currentProfile.name}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(updatedProfile)
+          });
+
+          console.log("Update response status:", updateResponse.status);
+          if (updateResponse.ok) {
+            currentProfile = updatedProfile;
+            document.getElementById("claim-message").innerText = "Insurance claimed successfully!";
+            displayClaimResult();
+          } else {
+            alert("Error updating profile. Please try again.");
+            console.error("Error response:", await updateResponse.text());
+          }
+        } catch (error) {
+          console.error("Error updating profile:", error);
+          alert("Error updating profile. Please try again.");
+        }
+      });
+    </script>
+    <script src="script.js"></script>
+  </body>
+  </html>

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Page</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.1/dist/tailwind.min.css" rel="stylesheet">
+
+  <!-- Prevent caching of the page to avoid going back after logout -->
+  <meta http-equiv="Cache-Control" content="no-store" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+</head>
+
+<body class="bg-gradient-to-br from-gray-100 to-blue-100 h-screen flex items-center justify-center" style="background-image: url('https://sjec.ac.in/storage/files/Project%20Pics/page-builder/about-section-college.jpg'); background-size: cover; background-position: center;">
+
+  <div class="bg-white shadow-2xl rounded-lg p-8 w-11/12 max-w-md transition-transform transform hover:scale-105 duration-300 ease-out">
+    <h2 class="text-2xl font-extrabold text-center text-blue-600 mb-6">Login</h2>
+    <form id="loginForm">
+      <div class="mb-5">
+        <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
+        <input type="text" id="username" name="username" placeholder="Enter your username" class="w-full mt-2 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+      </div>
+      <div class="mb-5 relative">
+        <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+        <input type="password" id="password" name="password" placeholder="Enter your password" class="w-full mt-2 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 pr-12" required>
+        <button type="button" id="togglePassword" class="absolute inset-y-0 right-3 mt-5 flex items-center text-gray-600 focus:outline-none">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12m0 3.6A3.6 3.6 0 1 1 15 8.4a3.6 3.6 0 0 1 0 7.2zm0 0a9.003 9.003 0 0 1-7.134-3.6m14.268 0a9.003 9.003 0 0 1-7.134 3.6" />
+          </svg>
+        </button>
+      </div>
+      
+      <div class="space-y-3">
+        <button type="submit" class="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 transition-colors duration-300 ease-in-out shadow-lg hover:shadow-2xl">
+          Login
+        </button>
+      
+        <button onclick="window.location.href='add_user.html'" class="w-full bg-green-500 text-white py-3 rounded-lg hover:bg-green-600 transition-colors duration-300 ease-in-out shadow-lg hover:shadow-2xl">
+          Register
+        </button>
+      </div>
+      
+    </form>
+    <div id="message" class="mt-4 text-center text-red-500 hidden"></div>
+  </div>
+
+  <script>
+    
+    document.getElementById('togglePassword').addEventListener('click', function () {
+      const passwordInput = document.getElementById('password');
+      const icon = this.querySelector('svg');
+      
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6c-4.418 0-8 3.582-8 8s3.582 8 8 8c4.418 0 8-3.582 8-8s-3.582-8-8-8zm0 12c-2.21 0-4-1.79-4-4s1.79-4 4-4c2.21 0 4 1.79 4 4s-1.79 4-4 4z"/>';
+      } else {
+        passwordInput.type = 'password';
+        icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12m0 3.6A3.6 3.6 0 1 1 15 8.4a3.6 3.6 0 0 1 0 7.2zm0 0a9.003 9.003 0 0 1-7.134-3.6m14.268 0a9.003 9.003 0 0 1-7.134 3.6" />'; 
+      }
+    });
+
+    document.getElementById('loginForm').addEventListener('submit', async function (event) {
+      event.preventDefault();
+
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+
+      try {
+        const response = await fetch('http://localhost:8080/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ username, password }),
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          alert(`Login successful! Welcome, ${result.username}.`);
+
+          // Store session data in sessionStorage
+          sessionStorage.setItem('username', result.username);
+          sessionStorage.setItem('email', result.email);
+          sessionStorage.setItem('userId', result.id);
+
+          // Prevent going back to the login page
+          sessionStorage.setItem('isLoggedIn', true);
+
+          // Redirect based on role
+          if (result.role === 'Admin') {
+            window.location.href = 'admin/index.html';
+          } else if (result.role === 'User') {
+            window.location.href = 'user/index.html';
+          } else {
+            window.location.href = 'index.html'; // Default redirection
+          }
+        } else {
+          const error = await response.json();
+          document.getElementById('message').textContent = error.message || 'Login failed!';
+          document.getElementById('message').classList.remove('hidden');
+        }
+      } catch (error) {
+        document.getElementById('message').textContent = 'An error occurred. Please try again later.';
+        document.getElementById('message').classList.remove('hidden');
+      }
+    });
+
+    // Disable the "Go Forward" button permanently
+    const goForwardButton = document.getElementById('goforward');
+    if (goForwardButton) {
+      goForwardButton.disabled = true;
+    }
+
+    // Prevent access to login page if already logged in
+    if (sessionStorage.getItem('isLoggedIn')) {
+      // Redirect based on role
+      if (sessionStorage.getItem('role') === 'Admin') {
+        window.location.href = 'admin/index.html';
+      } else if (sessionStorage.getItem('role') === 'User') {
+        window.location.href = 'user/index.html';
+      }
+    }
+  </script>
+</body>
+
+</html>
