@@ -23,37 +23,6 @@ A web-based application that streamlines the insurance claim process for employe
 | Tools          | Postman, VS Code     |
 | Version Control| Git & GitHub         |
 
-## 📁 Folder Structure
-
-/insurance-management-system
-│
-├── /backend
-│   ├── /api             # Route handlers (e.g., /claim, /auth)
-│   ├── /controllers     # Business logic for API routes
-│   ├── /models          # GORM models for database tables
-│   ├── /middlewares     # JWT auth, role-based access, logging
-│   ├── /config          # DB connection and environment configs
-│   ├── main.go          # Application entry point
-│   └── go.mod           # Go module definition
-│
-├── /frontend
-│   ├── index.html       # Main UI page (Login/Landing)
-│   ├── /css             # Stylesheets
-│   ├── /js              # Scripts for form handling, fetch API
-│   └── /assets          # Logos, icons, and image files
-│
-├── /screenshots         # UI snapshots for README/docs
-│
-└── README.md            # Project documentation
-
-## ⚙️ Setup Instructions
-
-### Prerequisites
-
-- Go (v1.20+)
-- PostgreSQL
-- Git
-
 
 ---
 
@@ -66,22 +35,22 @@ Ensure the following are installed:
 - [Go](https://go.dev/dl/) (v1.20 or later)
 - [PostgreSQL](https://www.postgresql.org/download/)
 - [Git](https://git-scm.com/)
-- [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) (optional for frontend)
+- [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) (optional for frontend preview)
 
 ### 📥 Installation Steps
 
-```bash
+
 # 1️⃣ Clone the Repository
 git clone https://github.com/your-username/insurance-management-system.git
 cd insurance-management-system
 
 # 2️⃣ Set Up PostgreSQL Database
-# Open psql and create a new database:
+# Open psql and create a new database
 psql -U your_username
 CREATE DATABASE insurance_db;
 
 # 3️⃣ Configure Environment
-# Either use .env file or hardcode the following:
+# Either use a .env file or set values directly in code:
 # DB_HOST=localhost
 # DB_PORT=5432
 # DB_USER=your_username
@@ -89,52 +58,16 @@ CREATE DATABASE insurance_db;
 # DB_NAME=insurance_db
 # JWT_SECRET=your_secret_key
 
-# 4️⃣ Install Go Dependencies
+# 4️⃣ Install Dependencies
 go mod tidy
 
-# 5️⃣ Auto-Migrate DB Tables (inside main.go or setup script)
-# Example:
+# 5️⃣ Auto-Migrate DB Tables (inside main.go)
 # db.AutoMigrate(&User{}, &Claim{})
 
 # 6️⃣ Run the Backend Server
 go run main.go
 
 # 7️⃣ Launch the Frontend
-# Option 1: Open frontend/index.html directly in browser
-# Option 2: Serve via Python
+# Option 1: Open frontend/index.html in browser
+# Option 2: Serve using Python
 python3 -m http.server 8080 --directory frontend
-
-# ==========================================================
-# 📡 API ENDPOINTS
-# ==========================================================
-
-# POST   /login          - Authenticate user/admin
-# POST   /register       - Register a new user
-# GET    /claims         - View all claims (Admin only)
-# POST   /claim          - Submit a new claim
-# PUT    /claim/:id      - Approve/Reject claim (Admin)
-
-# ==========================================================
-# 🧠 LEARNING OUTCOMES
-# ==========================================================
-
-# - Developed full-stack web app using Go and PostgreSQL
-# - Implemented secure JWT-based authentication and role control
-# - Built RESTful APIs with GORM ORM
-# - Learned to optimize database queries and handle user sessions
-
-# ==========================================================
-# 📄 LICENSE
-# ==========================================================
-
-# This project is licensed under the MIT License.
-
-# ==========================================================
-# 🙌 ACKNOWLEDGEMENTS
-# ==========================================================
-
-# - https://go.dev/doc/
-# - https://gorm.io/docs/
-# - https://www.postgresql.org/docs/
-# - https://github.com/dgrijalva/jwt-go
-# ==========================================================
